@@ -26,9 +26,17 @@ function AccessibilityControls({
   return (
     <section className="settings-section" aria-label="Accessibility Display Settings">
       <div className="settings-header">
-        <h2 className="section-title">Accessibility Settings</h2>
-        <span className="size-badge" aria-label={`Current text size: ${textPercentage} percent`}>
-          Text Size: {textPercentage}%
+        <div className="section-title-wrapper">
+          <span className="section-icon" aria-hidden="true">
+            🎛️
+          </span>
+          <h2 className="section-title">Display & Contrast Controls</h2>
+        </div>
+        <span
+          className="size-badge"
+          aria-label={`Current text size: ${textPercentage} percent, ${fontSize} pixels`}
+        >
+          Size: {textPercentage}% ({fontSize}px)
         </span>
       </div>
 
@@ -42,7 +50,7 @@ function AccessibilityControls({
           disabled={fontSize <= minFontSize}
           aria-label="Decrease text size"
         >
-          ➖ Decrease Text Size
+          <span>➖</span> Decrease Text Size
         </button>
 
         <button
@@ -54,19 +62,19 @@ function AccessibilityControls({
           disabled={fontSize >= maxFontSize}
           aria-label="Increase text size"
         >
-          ➕ Increase Text Size
+          <span>➕</span> Increase Text Size
         </button>
 
         {fontSize !== defaultFontSize && (
           <button
             type="button"
             id="reset-text-btn"
-            className="btn btn-secondary"
+            className="btn btn-secondary btn-reset"
             onClick={onResetText}
             onKeyDown={(e) => handleKeyDown(e, onResetText)}
             aria-label="Reset text size to default"
           >
-            ↺ Reset Size
+            <span>↺</span> Reset Size
           </button>
         )}
 
@@ -79,7 +87,7 @@ function AccessibilityControls({
           aria-pressed={highContrast}
           aria-label="Toggle high contrast accessibility mode"
         >
-          🌓 {highContrast ? 'Normal Contrast' : 'High Contrast'}
+          <span>🌓</span> {highContrast ? 'Normal Contrast' : 'High Contrast'}
         </button>
       </div>
     </section>

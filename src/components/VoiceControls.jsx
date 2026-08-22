@@ -244,13 +244,13 @@ function VoiceControls({
         <button
           type="button"
           id="read-aloud-btn"
-          className={`btn btn-action ${isSpeaking ? 'btn-speaking' : ''}`}
+          className={`btn btn-action btn-read-aloud ${isSpeaking ? 'btn-speaking' : ''}`}
           onClick={handleReadAloud}
           onKeyDown={(e) => handleKeyDown(e, handleReadAloud)}
           aria-pressed={isSpeaking}
           aria-label="Read question aloud"
         >
-          🔊 Read Aloud
+          <span>🔊</span> Read Aloud
         </button>
 
         {/* 1. Visible Stop Reading Button */}
@@ -262,40 +262,43 @@ function VoiceControls({
           onKeyDown={(e) => handleKeyDown(e, handleStopReading)}
           aria-label="Stop reading aloud"
         >
-          ⏹️ Stop Reading
+          <span>⏹️</span> Stop Reading
         </button>
 
         <button
           type="button"
           id="speak-answer-btn"
-          className={`btn btn-action ${isListening ? 'btn-listening' : ''}`}
+          className={`btn btn-action btn-speak-answer ${isListening ? 'btn-listening' : ''}`}
           onClick={handleSpeakAnswer}
           onKeyDown={(e) => handleKeyDown(e, handleSpeakAnswer)}
           aria-pressed={isListening}
           aria-label={isListening ? 'Stop listening' : 'Speak your answer using microphone'}
         >
-          {isListening ? '🎤 Listening...' : '🎤 Speak Answer'}
+          <span>🎤</span> {isListening ? 'Listening...' : 'Speak Answer'}
         </button>
       </div>
 
       {/* Informative Message for Devices without Kannada TTS Voice */}
       {selectedLang === 'kn' && !kannadaVoiceAvailable && (
         <div className="status-message status-info" role="status" aria-live="polite">
-          ℹ️ Kannada voice is not available on this device. Kannada text is still supported.
+          <span className="status-message-icon">ℹ️</span>
+          <span>Kannada voice is not available on this device. Kannada text is still supported.</span>
         </div>
       )}
 
       {/* Live Status Announcements */}
       {isListening && (
         <div className="status-message status-listening" role="status" aria-live="polite">
-          🎙️ Listening... Speak your address now. (Press Space or Enter to stop)
+          <span className="status-message-icon">🎙️</span>
+          <span>Listening... Speak your address clearly now. (Press Space or Enter to stop)</span>
         </div>
       )}
 
       {/* Error Announcements */}
       {speechError && (
         <div className="status-message status-error" role="alert">
-          {speechError}
+          <span className="status-message-icon">⚠️</span>
+          <span>{speechError}</span>
         </div>
       )}
     </div>
