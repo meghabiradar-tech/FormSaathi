@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./index.css";
 
 function App() {
   const [formText, setFormText] = useState("");
@@ -13,6 +14,7 @@ function App() {
   }
 
   setLoading(true);
+
 
   setTimeout(() => {
     const question = formText.trim();
@@ -110,127 +112,54 @@ function App() {
 
   return (
     <div
-      style={{
-        minHeight: "100vh",
-background: "linear-gradient(135deg, #eff6ff 0%, #f8fafc 50%, #eef2ff 100%)",
-fontFamily: "Arial, sans-serif",
-padding: "50px 20px",
-      }}
-    >
+      className="formsaathi-page">
       <div
-        style={{
-          maxWidth: "850px",
-margin: "0 auto",
-background: "white",
-padding: "45px",
-borderRadius: "24px",
-boxShadow: "0 20px 50px rgba(15, 23, 42, 0.10)",
-border: "1px solid #e5e7eb",
-        }}
-      >
+        className="formsaathi-card">
         <h1
-          style={{
-            fontSize: "42px",
-fontWeight: "800",
-marginBottom: "8px",
-color: "#111827",
-letterSpacing: "-1px",
-          }}
-        >
+          className="formsaathi-title">
           FormSaathi
         </h1>
 
         <p
-          style={{
-            fontSize: "17px",
-lineHeight: "1.6",
-color: "#6b7280",
-marginBottom: "32px",
-          }}
-        >
+          className="formsaathi-tagline">
           Your intelligent assistant for understanding and filling forms.
         </p>
         <div
-  style={{
-    display: "inline-block",
-    padding: "6px 12px",
-    marginBottom: "24px",
-    background: "#eff6ff",
-    color: "#2563eb",
-    borderRadius: "999px",
-    fontSize: "13px",
-    fontWeight: "600",
-  }}
->
+        className="ai-badge">
   ✨ AI-Powered Form Assistant
 </div>
 
         <label
-          style={{
-            display: "block",
-            fontSize: "16px",
-            fontWeight: "bold",
-            marginBottom: "10px",
-            color: "#374151",
-          }}
-        >
+          className="question-label">
           Enter your form question
         </label>
         
         <textarea
+          className="question-input"
           value={formText}
           onChange={(e) => setFormText(e.target.value)}
           placeholder="Example: What does annual family income mean?"
           rows="6"
-          style={{
-  width: "100%",
-  boxSizing: "border-box",
-  padding: "18px",
-  fontSize: "16px",
-  lineHeight: "1.6",
-  border: "2px solid #e5e7eb",
-  borderRadius: "14px",
-  resize: "vertical",
-  outline: "none",
-  background: "#f9fafb",
-  color: "#111827",
-  transition: "border-color 0.2s, box-shadow 0.2s",
-}}
+          
         />
         <p
-  style={{
-    marginTop: "8px",
-    marginBottom: "0",
-    fontSize: "13px",
-    color: "#9ca3af",
-  }}
+        className="input-hint"
+  
 >
   💡 Try questions about documents, income, dates, addresses, or Yes/No fields.
 </p>
 
         <button
+          className="analyze-button"
           onClick={handleAnalyze}
-          style={{
-            marginTop: "20px",
-width: "100%",
-padding: "15px",
-fontSize: "16px",
-fontWeight: "700",
-color: "white",
-background: "#2563eb",
-border: "none",
-borderRadius: "12px",
-cursor: loading ? "not-allowed" : "pointer",
-opacity: loading ? 0.75 : 1,
-boxShadow: "0 8px 20px rgba(37, 99, 235, 0.20)",
-transition: "all 0.2s ease",
-          }}
+          
         >
           {loading ? "Analyzing..." : "Analyze Form"}
         </button>
         
         {result && (
           <div
+            className="result-card"
             style={{
              marginTop: "30px",
 padding: "22px",
@@ -244,6 +173,7 @@ boxShadow: "0 4px 12px rgba(30, 58, 138, 0.06)",
             }}
           >
             <h3
+            className="result-heading"
   style={{
     margin: "0 0 10px 0",
     fontSize: "18px",
@@ -258,6 +188,7 @@ boxShadow: "0 4px 12px rgba(30, 58, 138, 0.06)",
           </div>
         )}
                  <div
+                 className="how-it-works"
           style={{
             marginTop: "40px",
             padding: "24px",
@@ -277,6 +208,7 @@ boxShadow: "0 4px 12px rgba(30, 58, 138, 0.06)",
           </h3>
 
           <div
+            className="steps-grid"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
@@ -309,6 +241,7 @@ boxShadow: "0 4px 12px rgba(30, 58, 138, 0.06)",
           </div>
         </div>
          <div
+          className="formsaathi-footer"
           style={{
             marginTop: "35px",
             paddingTop: "20px",
