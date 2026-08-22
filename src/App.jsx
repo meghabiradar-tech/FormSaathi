@@ -4,6 +4,7 @@ import AccessibilityControls from "./components/AccessibilityControls";
 import VoiceControls from "./components/VoiceControls";
 import AccessibilityStatus from "./components/AccessibilityStatus";
 import AccessibilityHelp from "./components/AccessibilityHelp";
+import Chatbot from "./components/Chatbot";
 import "./index.css";
 import "./App.css";
 
@@ -51,8 +52,10 @@ function App() {
 
     setLoading(true);
 
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
     try {
-      const response = await fetch("http://localhost:5000/api/analyze-form", {
+      const response = await fetch(`${apiUrl}/api/analyze-form`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -69,7 +72,7 @@ function App() {
       }
     } catch (error) {
       console.error("Error connecting to backend:", error);
-      setResult("Unable to connect to FormSaathi backend server. Please make sure the server is running on http://localhost:5000.");
+      setResult("Unable to connect to FormSaathi backend server. Please make sure the server is running.");
     } finally {
       setLoading(false);
     }
@@ -175,6 +178,9 @@ function App() {
             {result}
           </div>
         )}
+
+        {/* FormSaathi AI Conversational Chatbot Assistant */}
+        <Chatbot />
 
         {/* 2. Sample Form Question Section */}
         <main className="form-section">

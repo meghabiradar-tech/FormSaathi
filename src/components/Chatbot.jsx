@@ -21,8 +21,10 @@ function Chatbot() {
     setInputText("");
     setIsLoading(true);
 
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
     try {
-      const response = await fetch("http://localhost:5000/api/analyze-form", {
+      const response = await fetch(`${apiUrl}/api/analyze-form`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +54,7 @@ function Chatbot() {
         {
           sender: "bot",
           text:
-            "I'm having trouble connecting to the FormSaathi assistant server. Please check if the server is running on port 5000.",
+            "I'm having trouble connecting to the FormSaathi assistant server. Please check if the server is running.",
         },
       ]);
     } finally {
