@@ -43,7 +43,7 @@ function App() {
   const questionText = currentLangConfig.question;
   const inputPlaceholder = currentLangConfig.placeholder;
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!formText.trim()) {
       setResult("Please enter a form question first.");
       return;
@@ -51,105 +51,28 @@ function App() {
 
     setLoading(true);
 
-    setTimeout(() => {
-      const question = formText.trim();
-      const lowerQuestion = question.toLowerCase();
+    try {
+      const response = await fetch("http://localhost:5000/api/analyze-form", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ formText: formText.trim() }),
+      });
 
-      let explanation = "";
+      const data = await response.json();
 
-      if (
-        lowerQuestion.startsWith("do you") ||
-        lowerQuestion.startsWith("are you") ||
-        lowerQuestion.startsWith("is your") ||
-        lowerQuestion.startsWith("have you") ||
-        lowerQuestion.startsWith("has your") ||
-        lowerQuestion.startsWith("can you")
-      ) {
-        explanation =
-        `"${question}" is asking whether the statement applies to you. Select "Yes" if it is true for your situation, or "No" if it is not. If you are unsure, check the form instructions or the related document before selecting an option.`;
-      } else if (
-        lowerQuestion.includes("date of birth") ||
-        lowerQuestion.includes("dob")
-      ) {
-        explanation =
-          "What it means: The day, month, and year you were born.\n\nWhat to enter: Enter your date of birth exactly as shown on your official document.\n\nExample: 15/08/2005.";
-      } else if (
-        lowerQuestion.includes("income") ||
-        lowerQuestion.includes("salary")
-      ) {
-        explanation =
-          "What it means: Your or your family's total income for the period mentioned in the form.\n\nWhat to enter: Enter the income amount in rupees for the required period.\n\nExample: ₹3,60,000 per year.";
-      } else if (
-        lowerQuestion.includes("pan card") ||
-        lowerQuestion.includes("pan number")
-      ) {
-        explanation =
-          "What it means: Your 10-character Permanent Account Number (PAN).\n\nWhat to enter: Enter your PAN exactly as shown on your PAN card.\n\nExample: ABCDE1234F.";
-      } else if (
-        lowerQuestion.includes("phone") ||
-        lowerQuestion.includes("mobile number") ||
-        lowerQuestion.includes("contact number")
-      ) {
-        explanation =
-          "This question is asking for your phone or mobile number. Enter the number you currently use and make sure it is entered correctly.";
-      } else if (
-        lowerQuestion.includes("email") ||
-        lowerQuestion.includes("email address")
-      ) {
-        explanation =
-          "This question is asking for your email address. Enter an email address that you currently use and make sure it is spelled correctly.";
-      } else if (
-        lowerQuestion.includes("full name") ||
-        lowerQuestion.includes("your name") ||
-        lowerQuestion.includes("first name") ||
-        lowerQuestion.includes("last name")
-      ) {
-        explanation =
-          "This question is asking for your name. Enter your full name exactly as it appears on your official documents, if required.";
-      } else if (
-        lowerQuestion.startsWith("how many") ||
-        lowerQuestion.includes("number of") ||
-        lowerQuestion.includes("quantity")
-      ) {
-        explanation =
-          "This question is asking for a number or quantity. Enter the exact number requested by the form.";
-      } else if (
-        lowerQuestion.includes("occupation") ||
-        lowerQuestion.includes("profession") ||
-        lowerQuestion.includes("job")
-      ) {
-        explanation =
-          "What it means: Your current job, profession, or main work.\n\nWhat to enter: Enter your current occupation, such as student, farmer, teacher, engineer, or business owner.\n\nExample: Student.";
-      } else if (
-        lowerQuestion.includes("address") ||
-        lowerQuestion.includes("residential address") ||
-        lowerQuestion.includes("permanent address")
-      ) {
-        explanation =
-          "What it means: The place where you currently live or your permanent residence.\n\nWhat to enter: Enter your complete address as requested by the form, including house number, street, city, state, and PIN code if required.\n\nExample: 12 MG Road, Bengaluru, Karnataka – 560001.";
-      } else if (
-        lowerQuestion.includes("aadhaar") ||
-        lowerQuestion.includes("aadhar")
-      ) {
-        explanation =
-          "What it means: Your 12-digit Aadhaar identification number.\n\nWhat to enter: Enter the 12-digit number exactly as shown on your Aadhaar document.\n\nExample: 1234 5678 9012.";
-      } else if (lowerQuestion.startsWith("what")) {
-        explanation =
-          `"${question}" is asking you to provide specific information requested by the form.`;
-      } else if (lowerQuestion.startsWith("where")) {
-        explanation =
-          `"${question}" is asking you to provide a location or place related to the information requested.`;
-      } else if (lowerQuestion.startsWith("when")) {
-        explanation =
-          `"${question}" is asking you to provide a date or time related to the information requested.`;
+      if (data.success && data.explanation) {
+        setResult(data.explanation);
       } else {
-        explanation =
-          `"${question}" is asking you to provide information required by the form. Read the question carefully and enter the answer exactly as requested. If the question refers to a document, date, amount, or personal detail, use the information from your official records.`;
+        setResult(data.message || "Unable to analyze the form question. Please try again.");
       }
-
-      setResult(explanation);
+    } catch (error) {
+      console.error("Error connecting to backend:", error);
+      setResult("Unable to connect to FormSaathi backend server. Please make sure the server is running on http://localhost:5000.");
+    } finally {
       setLoading(false);
-    }, 800);
+    }
   };
 
   return (
