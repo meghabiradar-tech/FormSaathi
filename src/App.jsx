@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./index.css";
+import "./App.css";
 
 function App() {
   const [formText, setFormText] = useState("");
@@ -29,27 +30,26 @@ function App() {
       lowerQuestion.startsWith("have you") ||
       lowerQuestion.startsWith("has your") ||
       lowerQuestion.startsWith("can you")
-    ) {
-      explanation =
-        `"${question}" is a Yes/No question. Select "Yes" or "No" based on your situation.`;
+    ) {explanation = 
+      `"${question}" is asking whether the statement applies to you. Select "Yes" if it is true for your situation, or "No" if it is not. If you are unsure, check the form instructions or the related document before selecting an option.`;
     } else if (
       lowerQuestion.includes("date of birth") ||
       lowerQuestion.includes("dob")
     ) {
       explanation =
-        "Date of birth means the day, month, and year when you were born. Enter it exactly as shown on your official document.";
+  "What it means: The day, month, and year you were born.\n\nWhat to enter: Enter your date of birth exactly as shown on your official document.\n\nExample: 15/08/2005.";
     } else if (
       lowerQuestion.includes("income") ||
       lowerQuestion.includes("salary")
     ) {
       explanation =
-        "This question is asking about the amount of money you or your family earn. Enter the amount requested by the form, usually for the specified period.";
+  "What it means: Your or your family's total income for the period mentioned in the form.\n\nWhat to enter: Enter the income amount in rupees for the required period.\n\nExample: ₹3,60,000 per year.";
     } else if (
       lowerQuestion.includes("pan card") ||
       lowerQuestion.includes("pan number")
     ) {
       explanation =
-        "This question is asking for your PAN number. Enter the 10-character PAN exactly as it appears on your PAN card.";
+  "What it means: Your 10-character Permanent Account Number (PAN).\n\nWhat to enter: Enter your PAN exactly as shown on your PAN card.\n\nExample: ABCDE1234F.";
         } else if (
       lowerQuestion.includes("phone") ||
       lowerQuestion.includes("mobile number") ||
@@ -78,19 +78,26 @@ function App() {
     ) {
       explanation =
         "This question is asking for a number or quantity. Enter the exact number requested by the form.";  
-        } else if (
+      } else if (
+  lowerQuestion.includes("occupation") ||
+  lowerQuestion.includes("profession") ||
+  lowerQuestion.includes("job")
+) {
+  explanation =
+  "What it means: Your current job, profession, or main work.\n\nWhat to enter: Enter your current occupation, such as student, farmer, teacher, engineer, or business owner.\n\nExample: Student.";
+      } else if (
       lowerQuestion.includes("address") ||
       lowerQuestion.includes("residential address") ||
       lowerQuestion.includes("permanent address")
     ) {
       explanation =
-        "This question is asking for your address. Enter your complete current or permanent address as requested by the form.";  
+  "What it means: The place where you currently live or your permanent residence.\n\nWhat to enter: Enter your complete address as requested by the form, including house number, street, city, state, and PIN code if required.\n\nExample: 12 MG Road, Bengaluru, Karnataka – 560001."; 
       } else if (
       lowerQuestion.includes("aadhaar") ||
       lowerQuestion.includes("aadhar")
     ) {
       explanation =
-        "This question is asking for your Aadhaar number. Enter the 12-digit number exactly as shown on your Aadhaar document.";
+  "What it means: Your 12-digit Aadhaar identification number.\n\nWhat to enter: Enter the 12-digit number exactly as shown on your Aadhaar document.\n\nExample: 1234 5678 9012.";
     } else if (lowerQuestion.startsWith("what")) {
       explanation =
         `"${question}" is asking you to provide specific information requested by the form.`;
@@ -102,7 +109,7 @@ function App() {
         `"${question}" is asking you to provide a date or time related to the information requested.`;
     } else {
       explanation =
-        `FormSaathi explanation: "${question}" means the form is asking you to provide information related to this question.`;
+  `"${question}" is asking you to provide information required by the form. Read the question carefully and enter the answer exactly as requested. If the question refers to a document, date, amount, or personal detail, use the information from your official records.`;
     }
 
     setResult(explanation);
@@ -163,13 +170,13 @@ function App() {
             style={{
              marginTop: "30px",
 padding: "22px",
-background: "#eff6ff",
-border: "1px solid #93c5fd",
-borderRadius: "14px",
+background: "rgba(255, 255, 255, 0.95)",
+border: "1px solid rgba(96, 165, 250, 0.35)",
+borderRadius: "18px",
 color: "#1e3a8a",
 fontSize: "16px",
 lineHeight: "1.6",
-boxShadow: "0 4px 12px rgba(30, 58, 138, 0.06)",
+boxShadow: "0 12px 30px rgba(30, 64, 175, 0.10)",
             }}
           >
             <h3
@@ -188,7 +195,7 @@ boxShadow: "0 4px 12px rgba(30, 58, 138, 0.06)",
           </div>
         )}
                  <div
-                 className="how-it-works"
+                 className="How FormSaathi Helps"
           style={{
             marginTop: "40px",
             padding: "24px",
