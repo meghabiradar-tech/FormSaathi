@@ -14,23 +14,30 @@ function LanguageSelector({
 }) {
   return (
     <div className="language-selector-container">
-      <label htmlFor="language-select" className="language-label">
-        🌐 Language:
-      </label>
-      <select
-        id="language-select"
-        className="language-select"
-        value={selectedLang}
-        disabled={disabled}
-        onChange={(e) => onLanguageChange && onLanguageChange(e.target.value)}
-        aria-label="Select form language"
-      >
-        {languages.map((lang) => (
-          <option key={lang.code} value={lang.code}>
-            {lang.name}
-          </option>
-        ))}
-      </select>
+      <div className="language-label-wrapper">
+        <span className="language-icon" aria-hidden="true">
+          🌐
+        </span>
+        <label htmlFor="language-select" className="language-label">
+          Language / भाषा / ಭಾಷೆ:
+        </label>
+      </div>
+      <div className="select-wrapper">
+        <select
+          id="language-select"
+          className="language-select"
+          value={selectedLang}
+          disabled={disabled}
+          onChange={(e) => onLanguageChange && onLanguageChange(e.target.value)}
+          aria-label="Select form language"
+        >
+          {languages.map((lang) => (
+            <option key={lang.code} value={lang.code}>
+              {lang.name}
+            </option>
+          ))}
+        </select>
+      </div>
     </div>
   );
 }

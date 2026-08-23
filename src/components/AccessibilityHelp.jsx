@@ -47,17 +47,23 @@ function AccessibilityHelp() {
       tabIndex={0}
     >
       <div className="help-header">
-        <h2 className="help-title">♿ How to Use Accessibility Features</h2>
+        <div className="help-title-wrapper">
+          <span className="help-title-icon" aria-hidden="true">
+            ♿
+          </span>
+          <h2 className="help-title">How to Use Accessibility Features</h2>
+        </div>
+        <span className="help-subtitle">Quick Accessibility Guide</span>
       </div>
 
       <ul className="help-list" role="list">
         {HELP_ITEMS.map((item, index) => (
           <li key={index} className="help-item" role="listitem">
-            <span className="help-icon" aria-hidden="true">
-              {item.icon}
-            </span>
+            <div className="help-icon-wrapper" aria-hidden="true">
+              <span className="help-icon">{item.icon}</span>
+            </div>
             <div className="help-content">
-              <strong className="help-item-title">{item.title}:</strong>{' '}
+              <strong className="help-item-title">{item.title}</strong>
               <span className="help-item-desc">{item.description}</span>
             </div>
           </li>

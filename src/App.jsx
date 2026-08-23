@@ -1,122 +1,81 @@
-import { useState, useEffect } from 'react';
-import LanguageSelector, { DEFAULT_LANGUAGES } from './components/LanguageSelector';
-import AccessibilityControls from './components/AccessibilityControls';
-import VoiceControls from './components/VoiceControls';
-import AccessibilityStatus from './components/AccessibilityStatus';
-import AccessibilityHelp from './components/AccessibilityHelp';
-import './App.css';
+import { useState } from "react";
+import LanguageSelector from "./components/LanguageSelector";
+import AccessibilityControls from "./components/AccessibilityControls";
+import VoiceControls from "./components/VoiceControls";
+import AccessibilityStatus from "./components/AccessibilityStatus";
+import AccessibilityHelp from "./components/AccessibilityHelp";
+import Chatbot from "./components/Chatbot";
+import "./index.css";
+import "./App.css";
 
-const MIN_FONT_SIZE = 14;
-const MAX_FONT_SIZE = 26;
-const DEFAULT_FONT_SIZE = 18;
-
-const TRANSLATIONS = {
+const QUESTIONS = {
   en: {
-    question: 'What is your permanent residential address?',
-    placeholder: 'Type your address here or use voice...',
+    question: "What is your permanent residential address?",
+    placeholder: "Enter your full address (House No, Street, City, State, PIN)",
+    langTag: "en-IN",
   },
   hi: {
-    question: 'आपका स्थायी आवासीय पता क्या है?',
-    placeholder: 'अपना पता यहाँ लिखें या आवाज़ का उपयोग करें...',
+    question: "आपका स्थायी निवास पता क्या है?",
+    placeholder: "अपना पूरा पता दर्ज करें (मकान नंबर, गली, शहर, राज्य, पिन)",
+    langTag: "hi-IN",
   },
   kn: {
-    question: 'ನಿಮ್ಮ ಶಾಶ್ವತ ವಸತಿ ವಿಳಾಸವೇನು?',
-    placeholder: 'ನಿಮ್ಮ ವಿಳಾಸವನ್ನು ಇಲ್ಲಿ ನಮೂದಿಸಿ ಅಥವಾ ಧ್ವನಿ ಬಳಸಿ...',
+    question: "ನಿಮ್ಮ ಶಾಶ್ವತ ವಸತಿ ವಿಳಾಸವೇನು?",
+    placeholder: "ನಿಮ್ಮ ಸಂಪೂರ್ಣ ವಿಳಾಸವನ್ನು ನಮೂದಿಸಿ (ಮನೆ ಸಂಖ್ಯೆ, ರಸ್ತೆ, ನಗರ, ರಾಜ್ಯ, ಪಿನ್)",
+    langTag: "kn-IN",
   },
 };
 
 function App() {
-  // State for Language selection with persistence
-  const [selectedLang, setSelectedLang] = useState(() => {
-    try {
-      const saved = localStorage.getItem('formsaathi_lang');
-      if (saved && ['en', 'hi', 'kn'].includes(saved)) {
-        return saved;
-      }
-    } catch {
-      // Fallback
-    }
-    return 'en';
-  });
+  const [formText, setFormText] = useState("");
+  const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // State for Text Size with persistence
-  const [fontSize, setFontSize] = useState(() => {
-    try {
-      const saved = localStorage.getItem('formsaathi_font_size');
-      const parsed = Number(saved);
-      if (parsed >= MIN_FONT_SIZE && parsed <= MAX_FONT_SIZE) {
-        return parsed;
-      }
-    } catch {
-      // Fallback
-    }
-    return DEFAULT_FONT_SIZE;
-  });
-
-  // State for High Contrast with persistence
-  const [highContrast, setHighContrast] = useState(() => {
-    try {
-      const saved = localStorage.getItem('formsaathi_high_contrast');
-      return saved === 'true';
-    } catch {
-      return false;
-    }
-  });
-
-  const [answer, setAnswer] = useState('');
+  // Accessibility & Multilingual State
+  const [selectedLang, setSelectedLang] = useState("en");
+  const [fontSize, setFontSize] = useState(18);
+  const [highContrast, setHighContrast] = useState(false);
+  const [answer, setAnswer] = useState("");
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [speechError, setSpeechError] = useState('');
+  const [speechError, setSpeechError] = useState("");
 
-  // Active language configuration
-  const currentLangConfig =
-    DEFAULT_LANGUAGES.find((l) => l.code === selectedLang) || DEFAULT_LANGUAGES[0];
-  const questionText = TRANSLATIONS[selectedLang]?.question || TRANSLATIONS.en.question;
-  const inputPlaceholder = TRANSLATIONS[selectedLang]?.placeholder || TRANSLATIONS.en.placeholder;
+  const currentLangConfig = QUESTIONS[selectedLang] || QUESTIONS.en;
+  const questionText = currentLangConfig.question;
+  const inputPlaceholder = currentLangConfig.placeholder;
 
-  // Persist language selection
-  useEffect(() => {
-    try {
-      localStorage.setItem('formsaathi_lang', selectedLang);
-    } catch {
-      // Ignore
+  const handleAnalyze = async () => {
+    if (!formText.trim()) {
+      setResult("Please enter a form question first.");
+      return;
     }
-  }, [selectedLang]);
 
-  // Persist font size preference
-  useEffect(() => {
+    setLoading(true);
+
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
     try {
-      localStorage.setItem('formsaathi_font_size', fontSize.toString());
-    } catch {
-      // Ignore
+      const response = await fetch(`${apiUrl}/api/analyze-form`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ formText: formText.trim() }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.explanation) {
+        setResult(data.explanation);
+      } else {
+        setResult(data.message || "Unable to analyze the form question. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error connecting to backend:", error);
+      setResult("Unable to connect to FormSaathi backend server. Please make sure the server is running.");
+    } finally {
+      setLoading(false);
     }
-  }, [fontSize]);
-
-  // Persist high contrast preference
-  useEffect(() => {
-    try {
-      localStorage.setItem('formsaathi_high_contrast', highContrast.toString());
-    } catch {
-      // Ignore
-    }
-  }, [highContrast]);
-
-  // Handlers for adjusting text size within safe bounds
-  const handleIncreaseText = () => {
-    setFontSize((prev) => Math.min(prev + 2, MAX_FONT_SIZE));
-  };
-
-  const handleDecreaseText = () => {
-    setFontSize((prev) => Math.max(prev - 2, MIN_FONT_SIZE));
-  };
-
-  const handleResetText = () => {
-    setFontSize(DEFAULT_FONT_SIZE);
-  };
-
-  // Handler for toggling high contrast mode
-  const handleToggleContrast = () => {
-    setHighContrast((prev) => !prev);
   };
 
   return (
@@ -124,73 +83,159 @@ function App() {
       className={`app-container ${highContrast ? 'high-contrast' : ''}`}
       style={{ fontSize: `${fontSize}px` }}
     >
-      <div className="card" role="region" aria-label="FormSaathi Accessibility Assistant">
-        {/* Header Section */}
+      <div
+        className="card formsaathi-card"
+        role="region"
+        aria-label="FormSaathi Accessibility Assistant"
+      >
         <header className="header">
-          <h1 className="title">FormSaathi</h1>
+          <div className="brand-badge" aria-hidden="true">
+            <span className="brand-badge-dot"></span>
+            <span className="brand-badge-text">
+              Accessibility & Voice Module
+            </span>
+          </div>
+
+          <h1 className="title formsaathi-title">
+            <span className="brand-logo-icon">🇮🇳</span> FormSaathi
+          </h1>
+
           <p className="subtitle">
-            FormSaathi helps users access and complete digital forms.
+            Empowering everyone to effortlessly access and complete digital
+            forms with voice and multilingual accessibility.
           </p>
         </header>
 
-        {/* 1. Language Selector Component */}
+        {/* Multilingual Selector */}
         <LanguageSelector
           selectedLang={selectedLang}
           onLanguageChange={setSelectedLang}
         />
 
+        <p
+          className="formsaathi-tagline">
+          Your intelligent assistant for understanding and filling forms.
+        </p>
+        <div
+          className="ai-badge">
+          ✨ AI-Powered Form Assistant
+        </div>
+
+        <label
+          className="question-label">
+          Enter your form question
+        </label>
+
+        <textarea
+          className="question-input"
+          value={formText}
+          onChange={(e) => setFormText(e.target.value)}
+          placeholder="Example: What does annual family income mean?"
+          rows="6"
+
+        />
+        <p
+          className="input-hint"
+
+        >
+          💡 Try questions about documents, income, dates, addresses, or Yes/No fields.
+        </p>
+
+        <button
+          className="analyze-button"
+          onClick={handleAnalyze}
+        >
+          {loading ? "Analyzing..." : "Analyze Form"}
+        </button>
+
+        {result && (
+          <div
+            className="result-card"
+            style={{
+              marginTop: "30px",
+              padding: "22px",
+              background: "rgba(255, 255, 255, 0.95)",
+              border: "1px solid rgba(96, 165, 250, 0.35)",
+              borderRadius: "18px",
+              color: "#1e3a8a",
+              fontSize: "16px",
+              lineHeight: "1.6",
+              boxShadow: "0 12px 30px rgba(30, 64, 175, 0.10)",
+            }}
+          >
+            <h3
+              className="result-heading"
+              style={{
+                margin: "0 0 10px 0",
+                fontSize: "18px",
+                fontWeight: "700",
+                color: "#1e3a8a",
+              }}
+            >
+              FormSaathi Explanation
+            </h3>
+
+            {result}
+          </div>
+        )}
+
+        {/* FormSaathi AI Conversational Chatbot Assistant */}
+        <Chatbot />
+
         {/* 2. Sample Form Question Section */}
         <main className="form-section">
-          <h2 className="section-title">Sample Form Question</h2>
-
-          {/* Accessible Label linked to the Input */}
-          <label htmlFor="address-input" id="address-label" className="question-label">
-            {questionText}
-          </label>
-
-          {/* Step 1 in Tab Order: Address Input */}
-          <div className="input-container">
-            <input
-              id="address-input"
-              type="text"
-              className="text-input"
-              placeholder={inputPlaceholder}
-              value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
-              aria-labelledby="address-label"
-              autoComplete="street-address"
-            />
+          <div className="form-section-header">
+            <span className="section-step-badge">Field 1 of 1</span>
+            <h2 className="section-title">Sample Form Question</h2>
           </div>
 
-          {/* Step 2 & 3 in Tab Order: Voice Controls Component */}
-          <VoiceControls
-            textToRead={questionText}
-            selectedLang={selectedLang}
-            langTag={currentLangConfig.langTag}
-            onSpeechResult={(spokenTranscript) => setAnswer(spokenTranscript)}
-            isSpeaking={isSpeaking}
-            setIsSpeaking={setIsSpeaking}
-            isListening={isListening}
-            setIsListening={setIsListening}
-            speechError={speechError}
-            setSpeechError={setSpeechError}
-          />
+          <div className="question-box">
+            {/* Accessible Label linked to the Input */}
+            <label htmlFor="address-input" id="address-label" className="question-label">
+              <span className="question-bullet">📍</span> {questionText}
+            </label>
+
+            {/* Step 1 in Tab Order: Address Input */}
+            <div className="input-container">
+              <input
+                id="address-input"
+                type="text"
+                className="text-input"
+                placeholder={inputPlaceholder}
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                aria-labelledby="address-label"
+                autoComplete="street-address"
+              />
+            </div>
+
+            {/* Step 2 & 3 in Tab Order: Voice Controls Component */}
+            <VoiceControls
+              textToRead={questionText}
+              selectedLang={selectedLang}
+              langTag={currentLangConfig.langTag}
+              onSpeechResult={(spokenTranscript) => setAnswer(spokenTranscript)}
+              isSpeaking={isSpeaking}
+              setIsSpeaking={setIsSpeaking}
+              isListening={isListening}
+              setIsListening={setIsListening}
+              speechError={speechError}
+              setSpeechError={setSpeechError}
+            />
+          </div>
         </main>
 
-        {/* Step 4-6 in Tab Order: Accessibility Controls Component */}
+        {/* 3. Display Controls */}
         <AccessibilityControls
           fontSize={fontSize}
-          minFontSize={MIN_FONT_SIZE}
-          maxFontSize={MAX_FONT_SIZE}
-          defaultFontSize={DEFAULT_FONT_SIZE}
-          onIncreaseText={handleIncreaseText}
-          onDecreaseText={handleDecreaseText}
-          onResetText={handleResetText}
+          onIncreaseText={() => setFontSize((prev) => Math.min(prev + 2, 26))}
+          onDecreaseText={() => setFontSize((prev) => Math.max(prev - 2, 14))}
+          onResetText={() => setFontSize(18)}
           highContrast={highContrast}
-          onToggleContrast={handleToggleContrast}
+          onToggleContrast={() => setHighContrast((prev) => !prev)}
         />
 
-        {/* Step 7 in Tab Order: Real-Time Accessibility Status Panel */}
+        {/* 4. Live Status Panel */}
         <AccessibilityStatus
           selectedLang={selectedLang}
           fontSize={fontSize}
@@ -200,11 +245,78 @@ function App() {
           speechError={speechError}
         />
 
-        {/* Step 8 in Tab Order: Accessibility Help Section */}
+        {/* 5. Help Guide */}
         <AccessibilityHelp />
-      </div>
-    </div>
-  );
-}
 
-export default App;
+        <div
+          className="How FormSaathi Helps"
+          style={{
+            marginTop: "40px",
+            padding: "24px",
+            background: "#f9fafb",
+            borderRadius: "16px",
+            border: "1px solid #e5e7eb",
+          }}
+        >
+          <h3
+            style={{
+              margin: "0 0 20px 0",
+              fontSize: "20px",
+              color: "#111827",
+            }}
+          >
+            How FormSaathi Works
+          </h3>
+
+          <div
+            className="steps-grid"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+              gap: "16px",
+            }}
+          >
+            <div>
+              <div style={{ fontSize: "24px", marginBottom: "8px" }}>📝</div>
+              <strong>1. Enter</strong>
+              <p style={{ color: "#6b7280", fontSize: "14px", lineHeight: "1.5" }}>
+                Enter a confusing form question.
+              </p>
+            </div>
+
+            <div>
+              <div style={{ fontSize: "24px", marginBottom: "8px" }}>🤖</div>
+              <strong>2. Analyze</strong>
+              <p style={{ color: "#6b7280", fontSize: "14px", lineHeight: "1.5" }}>
+                FormSaathi identifies what the question means.
+              </p>
+            </div>
+
+            <div>
+              <div style={{ fontSize: "24px", marginBottom: "8px" }}>💡</div>
+              <strong>3. Understand</strong>
+              <p style={{ color: "#6b7280", fontSize: "14px", lineHeight: "1.5" }}>
+                Get simple guidance on what to enter.
+              </p>
+            </div>
+          </div>
+        </div>
+      <div
+        className="formsaathi-footer"
+        style={{
+          marginTop: "35px",
+          paddingTop: "20px",
+          borderTop: "1px solid #e5e7eb",
+          textAlign: "center",
+          fontSize: "13px",
+          color: "#9ca3af",
+        }}
+      >
+        FormSaathi • Making forms easier for everyone
+      </div>
+      </div >
+    </div >
+  );
+  }
+
+  export default App;
